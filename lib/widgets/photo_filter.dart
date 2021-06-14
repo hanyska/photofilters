@@ -188,7 +188,7 @@ class _PhotoFilterSelectorState extends State<PhotoFilterSelector> {
     if (cachedFilters[filter.name] == null) {
       return FutureBuilder<List<int>>(
         future: compute(
-            applyFilter as FutureOr<List<int>> Function(Map<String, dynamic>),
+            applyFilter,
             <String, dynamic>{
               "filter": filter,
               "image": image,
@@ -254,7 +254,7 @@ class _PhotoFilterSelectorState extends State<PhotoFilterSelector> {
     if (cachedFilters[filter?.name ?? "_"] == null) {
       return FutureBuilder<List<int>>(
         future: compute(
-            applyFilter as FutureOr<List<int>> Function(Map<String, dynamic>),
+            applyFilter,
             <String, dynamic>{
               "filter": filter,
               "image": image,
@@ -315,7 +315,7 @@ class _PhotoFilterSelectorState extends State<PhotoFilterSelector> {
 }
 
 ///The global applyfilter function
-List<int>? applyFilter(Map<String, dynamic> params) {
+FutureOr<List<int>> applyFilter(Map<String, dynamic> params) {
   Filter? filter = params["filter"];
   imageLib.Image image = params["image"];
   String filename = params["filename"];
@@ -323,15 +323,14 @@ List<int>? applyFilter(Map<String, dynamic> params) {
   if (filter != null) {
     filter.apply(_bytes as dynamic, image.width, image.height);
   }
-  imageLib.Image _image =
-      imageLib.Image.fromBytes(image.width, image.height, _bytes);
+  imageLib.Image _image = imageLib.Image.fromBytes(image.width, image.height, _bytes);
   _bytes = imageLib.encodeNamedImage(_image, filename)!;
 
   return _bytes;
 }
 
 ///The global buildThumbnail function
-List<int>? buildThumbnail(Map<String, dynamic> params) {
+FutureOr<List<int>> buildThumbnail(Map<String, dynamic> params) {
   int? width = params["width"];
   params["image"] = imageLib.copyResize(params["image"], width: width);
   return applyFilter(params);
